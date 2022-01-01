@@ -1,6 +1,6 @@
 # nodeDomainScrape
 
-1 install node and download the code;
+1 install node (`https://nodejs.org/en/`) and download the code;
 
 2 run `npm install` in the terminal;
 
