@@ -1,4 +1,8 @@
 const puppeteer = require('puppeteer');
+const ObjectsToCsv = require('objects-to-csv');
+
+
+
 const getSoldData = (async (url, urlPage2) => {
     const browser = await puppeteer.launch();
     let page = await browser.newPage();
@@ -10,9 +14,15 @@ const getSoldData = (async (url, urlPage2) => {
     );
     let addresses = await page.evaluate(() => (Array.from(document.querySelectorAll('[data-testid="listing-card-wrapper-premiumplus"] [data-testid="address-wrapper"]')).map((address) => address.innerText.replace(/\n/, " "))).filter(String)
     );
+
+    let agencies = await page.evaluate(() => (Array.from(document.querySelectorAll('[data-testid="listing-card-wrapper-premiumplus"] [data-testid="listing-card-branding"] span:last-child')).map((data) => data.innerText.replace(/\n/, " ")))
+    );
+
     let prices = await page.evaluate(() => (Array.from(document.querySelectorAll('[data-testid="listing-card-wrapper-premiumplus"] [data-testid="listing-card-price"]')).map((price) => price.innerText.replace(/\n/, " "))).filter(String)
     );
-    let soldDates = await page.evaluate(() => (Array.from(document.querySelectorAll('[data-testid="listing-card-wrapper-premiumplus"] [data-testid="listing-card-tag"]')).map((data) => data.innerText.replace(/\n/, " "))).filter(String)
+    let soldDates = await page.evaluate(() => (Array.from(document.querySelectorAll('[data-testid="listing-card-wrapper-premiumplus"] [data-testid="listing-card-tag"]')).map((data) => data.innerText.replace(/\n/, " ").substring(data.innerText.replace(/\n/, " ").length - 11, data.innerText.replace(/\n/, " ").length))).filter(String)
+    );
+    let soldMethods = await page.evaluate(() => (Array.from(document.querySelectorAll('[data-testid="listing-card-wrapper-premiumplus"] [data-testid="listing-card-tag"]')).map((data) => data.innerText.replace(/\n/, " ").substring(0, data.innerText.replace(/\n/, " ").length - 11))).filter(String)
     );
     let bedroomNumbers = await page.evaluate(() => (Array.from(document.querySelectorAll('[data-testid="listing-card-wrapper-premiumplus"] [data-testid="property-features-feature"]:first-child')).map((data) => data.innerText.replace(/\n/, " "))).filter(String)
     );
@@ -23,9 +33,11 @@ const getSoldData = (async (url, urlPage2) => {
         let tempInfomation = {
             address: addresses[i],
             agent: agents[i],
+            agency: agencies[i],
             price: prices[i],
             bedroomNumber: bedroomNumbers[i],
             soldDate: soldDates[i],
+            soldMethod: soldMethods[i]
         };
         recentSoldData = [...recentSoldData, tempInfomation];
     }
@@ -49,8 +61,11 @@ const getSoldData = (async (url, urlPage2) => {
     );
     prices = await page.evaluate(() => (Array.from(document.querySelectorAll('[data-testid="listing-card-wrapper-premiumplus"] [data-testid="listing-card-price"]')).map((price) => price.innerText.replace(/\n/, " "))).filter(String)
     );
-    soldDates = await page.evaluate(() => (Array.from(document.querySelectorAll('[data-testid="listing-card-wrapper-premiumplus"] [data-testid="listing-card-tag"]')).map((data) => data.innerText.replace(/\n/, " "))).filter(String)
+    soldDates = await page.evaluate(() => (Array.from(document.querySelectorAll('[data-testid="listing-card-wrapper-premiumplus"] [data-testid="listing-card-tag"]')).map((data) => data.innerText.replace(/\n/, " ").substring(data.innerText.replace(/\n/, " ").length - 11, data.innerText.replace(/\n/, " ").length))).filter(String)
     );
+    soldMethods = await page.evaluate(() => (Array.from(document.querySelectorAll('[data-testid="listing-card-wrapper-premiumplus"] [data-testid="listing-card-tag"]')).map((data) => data.innerText.replace(/\n/, " ").substring(0, data.innerText.replace(/\n/, " ").length - 11))).filter(String)
+    );
+
     bedroomNumbers = await page.evaluate(() => (Array.from(document.querySelectorAll('[data-testid="listing-card-wrapper-premiumplus"] [data-testid="property-features-feature"]:first-child')).map((data) => data.innerText.replace(/\n/, " "))).filter(String)
     );
 
@@ -58,16 +73,24 @@ const getSoldData = (async (url, urlPage2) => {
         let tempInfomation = {
             address: addresses[i],
             agent: agents[i],
+            agency: agencies[i],
             price: prices[i],
             bedroomNumber: bedroomNumbers[i],
             soldDate: soldDates[i],
+            soldMethod: soldMethods[i]
         };
         recentSoldData = [...recentSoldData, tempInfomation];
     }
 
     await browser2.close();
 
-    console.log("There are " + recentSoldData.length + " houses recently sold :", recentSoldData);
+    const csv = new ObjectsToCsv(recentSoldData);
+    await csv.toDisk('./test.csv');
+    console.log(await csv.toString());
+
+
+
+    // console.log("There are " + recentSoldData.length + " houses recently sold :", recentSoldData);
 
     // console.log(agents.length + ' agents', agents, addresses.length + ' addresses:', addresses, prices.length + ' prices:', prices, soldDates.length + ' Sold Dates:', soldDates, bedroomNumbers.length + " bedroom numbers " + bedroomNumbers);
 
