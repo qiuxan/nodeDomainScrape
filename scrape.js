@@ -18,13 +18,17 @@ const getSoldData = (async (url, urlPage2) => {
     let agencies = await page.evaluate(() => (Array.from(document.querySelectorAll('[data-testid="listing-card-wrapper-premiumplus"] [data-testid="listing-card-branding"] span:last-child')).map((data) => data.innerText.replace(/\n/, " ")))
     );
 
-    let prices = await page.evaluate(() => (Array.from(document.querySelectorAll('[data-testid="listing-card-wrapper-premiumplus"] [data-testid="listing-card-price"]')).map((price) => price.innerText.replace(/\n/, " "))).filter(String)
+    let prices = await page.evaluate(() =>
+        (Array.from(document.querySelectorAll('[data-testid="listing-card-wrapper-premiumplus"] [data-testid="listing-card-price"]')).map((price) => price.innerText.replace(/\n/, " "))).filter(String)
     );
-    let soldDates = await page.evaluate(() => (Array.from(document.querySelectorAll('[data-testid="listing-card-wrapper-premiumplus"] [data-testid="listing-card-tag"]')).map((data) => data.innerText.replace(/\n/, " ").substring(data.innerText.replace(/\n/, " ").length - 11, data.innerText.replace(/\n/, " ").length))).filter(String)
+    let soldDates = await page.evaluate(() =>
+        (Array.from(document.querySelectorAll('[data-testid="listing-card-wrapper-premiumplus"] [data-testid="listing-card-tag"]')).map((data) => data.innerText.replace(/\n/, " ").substring(data.innerText.replace(/\n/, " ").length - 11, data.innerText.replace(/\n/, " ").length))).filter(String)
     );
-    let soldMethods = await page.evaluate(() => (Array.from(document.querySelectorAll('[data-testid="listing-card-wrapper-premiumplus"] [data-testid="listing-card-tag"]')).map((data) => data.innerText.replace(/\n/, " ").substring(0, data.innerText.replace(/\n/, " ").length - 11))).filter(String)
+    let soldMethods = await page.evaluate(() =>
+        (Array.from(document.querySelectorAll('[data-testid="listing-card-wrapper-premiumplus"] [data-testid="listing-card-tag"]')).map((data) => data.innerText.replace(/\n/, " ").substring(0, data.innerText.replace(/\n/, " ").length - 11))).filter(String)
     );
-    let bedroomNumbers = await page.evaluate(() => (Array.from(document.querySelectorAll('[data-testid="listing-card-wrapper-premiumplus"] [data-testid="property-features-feature"]:first-child')).map((data) => data.innerText.replace(/\n/, " "))).filter(String)
+    let bedroomNumbers = await page.evaluate(() =>
+        (Array.from(document.querySelectorAll('[data-testid="listing-card-wrapper-premiumplus"] [data-testid="property-features-feature"]:first-child')).map((data) => data.innerText.replace(/\n/, " "))).filter(String)
     );
 
     var recentSoldData = [];
@@ -57,7 +61,8 @@ const getSoldData = (async (url, urlPage2) => {
     await page.goto(url, { waitUntil: 'domcontentloaded' });
     agents = await page.evaluate(() => (Array.from(document.querySelectorAll('[data-testid="listing-card-branding"]>*:nth-child(2)>span:first-child, [data-testid="listing-card-branding"]>*:nth-child(1) >span:first-child')).map((agent) => agent.innerText.replace(/\n/, " "))).filter(String)
     );
-    addresses = await page.evaluate(() => (Array.from(document.querySelectorAll('[data-testid="listing-card-wrapper-premiumplus"] [data-testid="address-wrapper"]')).map((address) => address.innerText.replace(/\n/, " "))).filter(String)
+    addresses = await page.evaluate(() =>
+        (Array.from(document.querySelectorAll('[data-testid="listing-card-wrapper-premiumplus"] [data-testid="address-wrapper"]')).map((address) => address.innerText.replace(/\n/, " "))).filter(String)
     );
     prices = await page.evaluate(() => (Array.from(document.querySelectorAll('[data-testid="listing-card-wrapper-premiumplus"] [data-testid="listing-card-price"]')).map((price) => price.innerText.replace(/\n/, " "))).filter(String)
     );
@@ -95,5 +100,5 @@ const getSoldData = (async (url, urlPage2) => {
     // console.log(agents.length + ' agents', agents, addresses.length + ' addresses:', addresses, prices.length + ' prices:', prices, soldDates.length + ' Sold Dates:', soldDates, bedroomNumbers.length + " bedroom numbers " + bedroomNumbers);
 
     // return recentSoldData;
-})("https://www.domain.com.au/sold-listings/berwick-vic-3806/house/?bedrooms=4-any&excludepricewithheld=1", "https://www.domain.com.au/sold-listings/berwick-vic-3806/house/?bedrooms=4-any&excludepricewithheld=1&page=2");
+})("https://www.domain.com.au/sold-listings/berwick-vic-3806/", "https://www.domain.com.au/sold-listings/berwick-vic-3806/?page=2");
 
